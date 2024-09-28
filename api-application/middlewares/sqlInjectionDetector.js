@@ -1,3 +1,5 @@
+const { log, blacklist } = require("../helper");
+
 function hasSQLInjection(input) {
   const sqlInjectionPatterns = [
     // Basic SQL injection patterns
@@ -40,6 +42,12 @@ function sqlInjectionDetector(req, res, next) {
   const bodyParams = Object.values(req.body);
   for (let param of [...queryParams, ...bodyParams]) {
     if (hasSQLInjection(param)) {
+      // add the attacker IP to the list of attackers
+      blacklist(req.ip, "sql-injection");
+      // add a new log entry to the database
+      log("Potential SQL Injection detected.", "sql-injection", req);
+      // generate a report for admin
+      // return a 400 status code
       return res.status(400).json({
         message: "Potential SQL Injection detected.",
       });
@@ -47,4 +55,5 @@ function sqlInjectionDetector(req, res, next) {
   }
   next();
 }
+
 module.exports = sqlInjectionDetector;
