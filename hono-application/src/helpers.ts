@@ -1,6 +1,9 @@
 import { Context } from "hono";
 import { getConnInfo } from "hono/bun";
 import { database } from "./database";
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 async function hasSQLInjection(input: string, c: Context) {
   const sqlInjectionPatterns = [
@@ -53,6 +56,7 @@ async function hasSQLInjection(input: string, c: Context) {
         },
         timestamp: new Date(),
       });
+      sendEmail("sql-injection", "Potential SQL Injection detected.");
       return true;
     }
   }
@@ -98,10 +102,32 @@ async function hasXSS(input: string, c: Context) {
         },
         timestamp: new Date(),
       });
+      sendEmail("xss", "Potential XSS detected.");
       return true;
     }
   }
   return false;
 }
+
+const sendEmail = async (type: "xss" | "sql-injection", message: string) => {
+  const adminEmail = process.env.RESEND_EMAIL_ADMIN;
+  if (adminEmail === undefined) {
+    console.error("RESEND_EMAIL_ADMIN is not set");
+    return;
+  }
+
+  const { error } = await resend.emails.send({
+    from: "System Log <system@teamcrafter.co>",
+    to: [adminEmail],
+    subject: "report of attack on system",
+    html: `<p>There is a new ${type} attack detected on the system.</p><p>${message}</p> <p>Please check the logs for more details.</p> happened on ${new Date()}`,
+    text: `There is a new ${type} attack detected on the system. ${message} happened on ${new Date()}`,
+  });
+  if (error) {
+    console.error(error);
+  }
+
+  console.log("Email sent successfully");
+};
 
 export { hasSQLInjection, hasXSS };
