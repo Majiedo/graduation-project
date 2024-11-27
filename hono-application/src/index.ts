@@ -21,7 +21,11 @@ const limiter = rateLimiter({
   },
   handler: async (c) => {
     const info = getConnInfo(c);
-    const ip = info.remote.address;
+    let ip = info.remote.address;
+    if (ip && ip.startsWith("::ffff:")) {
+      ip = ip.split(":").pop();
+    }
+
     await database.collection("blacklist").insertOne({
       ip,
       type: "ddos",

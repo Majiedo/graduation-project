@@ -40,7 +40,10 @@ async function hasSQLInjection(input: string, c: Context) {
   for (let pattern of sqlInjectionPatterns) {
     if (pattern.test(input)) {
       const info = getConnInfo(c);
-      const ip = info.remote.address;
+      let ip = info.remote.address;
+      if (ip && ip.startsWith("::ffff:")) {
+        ip = ip.split(":").pop();
+      }
       await database.collection("blacklist").insertOne({
         ip,
         type: "sql-injection",
@@ -100,7 +103,10 @@ async function hasXSS(input: string, c: Context) {
   for (let pattern of xssPatterns) {
     if (pattern.test(input)) {
       const info = getConnInfo(c);
-      const ip = info.remote.address;
+      let ip = info.remote.address;
+      if (ip && ip.startsWith("::ffff:")) {
+        ip = ip.split(":").pop();
+      }
       await database.collection("blacklist").insertOne({
         ip,
         type: "xss",
