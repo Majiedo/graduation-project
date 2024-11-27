@@ -2,6 +2,7 @@ import { Context } from "hono";
 import { getConnInfo } from "hono/bun";
 import { database } from "./database";
 import { Resend } from "resend";
+import axios from "axios";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -45,14 +46,28 @@ async function hasSQLInjection(input: string, c: Context) {
         type: "sql-injection",
         timestamp: new Date(),
       });
+
+      const response = await axios.get(`http://ip-api.com/json/${ip}`);
+
+      const { country, city, countryCode } = response.data;
+
+      const flag = countryCode
+        ? String.fromCodePoint(
+            ...[...countryCode.toUpperCase()].map(
+              (c) => 127397 + c.charCodeAt(),
+            ),
+          )
+        : null;
+
       await database.collection("logs").insertOne({
+        serverID: process.env.SERVER_ID,
         type: "sql-injection",
         message: "Potential SQL Injection detected.",
         attacker: {
           ip,
-          country: "Saudi Arabia",
-          region: "Riyadh",
-          city: "Riyadh",
+          country,
+          city,
+          flag,
         },
         timestamp: new Date(),
       });
@@ -91,14 +106,28 @@ async function hasXSS(input: string, c: Context) {
         type: "xss",
         timestamp: new Date(),
       });
+
+      const response = await axios.get(`http://ip-api.com/json/${ip}`);
+
+      const { country, city, countryCode } = response.data;
+
+      const flag = countryCode
+        ? String.fromCodePoint(
+            ...[...countryCode.toUpperCase()].map(
+              (c) => 127397 + c.charCodeAt(),
+            ),
+          )
+        : null;
+
       await database.collection("logs").insertOne({
+        serverID: process.env.SERVER_ID,
         type: "xss",
         message: "Potential XSS detected.",
         attacker: {
           ip,
-          country: "Saudi Arabia",
-          region: "Riyadh",
-          city: "Riyadh",
+          country,
+          city,
+          flag,
         },
         timestamp: new Date(),
       });
@@ -109,7 +138,10 @@ async function hasXSS(input: string, c: Context) {
   return false;
 }
 
-const sendEmail = async (type: "xss" | "sql-injection", message: string) => {
+export const sendEmail = async (
+  type: "xss" | "sql-injection" | "ddos",
+  message: string,
+) => {
   const adminEmail = process.env.RESEND_EMAIL_ADMIN;
   if (adminEmail === undefined) {
     console.error("RESEND_EMAIL_ADMIN is not set");
