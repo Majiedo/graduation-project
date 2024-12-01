@@ -46,7 +46,7 @@ async function hasSQLInjection(input: string, c: Context) {
       }
       await database.collection("blacklist").insertOne({
         ip,
-        type: "sql-injection",
+        reason: "SQL Injection attempt",
         timestamp: new Date(),
       });
 
@@ -109,7 +109,7 @@ async function hasXSS(input: string, c: Context) {
       }
       await database.collection("blacklist").insertOne({
         ip,
-        type: "xss",
+        type: "XSS attack detected",
         timestamp: new Date(),
       });
 
@@ -145,7 +145,7 @@ async function hasXSS(input: string, c: Context) {
 }
 
 export const sendEmail = async (
-  type: "xss" | "sql-injection" | "ddos",
+  type: "xss" | "sql-injection" | "dos",
   message: string,
 ) => {
   const adminEmail = process.env.RESEND_EMAIL_ADMIN;

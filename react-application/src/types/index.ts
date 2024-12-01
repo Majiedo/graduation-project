@@ -15,6 +15,6 @@ export type logs = {
 export type blacklist = {
   _id: string;
   ip: string;
-  type: string;
+  reason: string;
   timestamp: string;
 };

@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 const Logs = () => {
   return (
     <div className="w-full flex flex-col items-center justify-center gap-y-5 pt-10 font-mono">
-      <Tabs defaultValue="logs" className="w-3/4">
+      <Tabs defaultValue="logs" className="px-2 w-[90%]">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="logs">Logs</TabsTrigger>
           <TabsTrigger value="blacklist">Blacklist</TabsTrigger>

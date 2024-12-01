@@ -28,7 +28,7 @@ const limiter = rateLimiter({
 
     await database.collection("blacklist").insertOne({
       ip,
-      type: "ddos",
+      type: "DoS attack detected",
       timestamp: new Date(),
     });
 
@@ -44,8 +44,8 @@ const limiter = rateLimiter({
 
     await database.collection("logs").insertOne({
       serverID: process.env.SERVER_ID,
-      type: "DDOS",
-      message: "DDOS attack detected.",
+      type: "DOS",
+      message: "DOS attack detected.",
       attacker: {
         ip,
         country,
@@ -54,7 +54,7 @@ const limiter = rateLimiter({
       },
       timestamp: new Date(),
     });
-    sendEmail("ddos", "DDOS attack detected.");
+    sendEmail("dos", "DOS attack detected.");
     return c.json({ message: "you're rated limited" }, { status: 403 });
   },
 });

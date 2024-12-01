@@ -46,7 +46,7 @@ const BlacklistTable = () => {
         <Input
           value={search}
           onChange={(event) => setSearch(event.target.value)}
-          placeholder="Search by IP or Type..."
+          placeholder="Search by IP or Reason..."
           className="my-5"
         />
         <Button onClick={() => setModal(true)}>Add to blacklist</Button>
@@ -56,7 +56,7 @@ const BlacklistTable = () => {
           <TableRow>
             <TableHead>Number</TableHead>
             <TableHead>IP</TableHead>
-            <TableHead>Type</TableHead>
+            <TableHead>Reason</TableHead>
             <TableHead>Time</TableHead>
             <TableHead>Action</TableHead>
           </TableRow>
@@ -66,13 +66,13 @@ const BlacklistTable = () => {
             .filter(
               (item) =>
                 item.ip.toLowerCase().includes(search.toLowerCase()) ||
-                item.type.toLowerCase().includes(search.toLowerCase()),
+                item.reason.toLowerCase().includes(search.toLowerCase()),
             )
             .map((item, index) => (
               <TableRow key={item._id}>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell>{item.ip}</TableCell>
-                <TableCell>{item.type}</TableCell>
+                <TableCell>{item.reason}</TableCell>
                 <TableCell>{moment(item.timestamp).fromNow()}</TableCell>
                 <TableCell>
                   <DropdownMenu>

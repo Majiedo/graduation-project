@@ -21,7 +21,7 @@ export const AddBlacklistModal = ({
   onClose,
   onSuccess,
 }: AddBlacklistModalProps) => {
-  const [type, setType] = useState<string>("");
+  const [reason, setReason] = useState<string>("");
   const [ip, setIp] = useState<string>("");
 
   const handleSubmit = () => {
@@ -32,12 +32,12 @@ export const AddBlacklistModal = ({
       },
       body: JSON.stringify({
         ip,
-        type,
+        reason,
       }),
     })
       .then((res) => res.json())
       .then((data) => {
-        setType("");
+        setReason("");
         setIp("");
         onSuccess(data.blacklist);
       });
@@ -59,9 +59,9 @@ export const AddBlacklistModal = ({
           onChange={(e) => setIp(e.target.value)}
         />
         <Input
-          placeholder="Type"
-          value={type}
-          onChange={(e) => setType(e.target.value)}
+          placeholder="Reason"
+          value={reason}
+          onChange={(e) => setReason(e.target.value)}
         />
         <Button onClick={handleSubmit}>Confirm</Button>
       </DialogContent>
