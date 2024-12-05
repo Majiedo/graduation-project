@@ -25,6 +25,7 @@ const BlacklistTable = () => {
   const [search, setSearch] = useState<string>("");
   const [blacklist, setBlacklist] = useState<blacklist[]>([]);
   const [modal, setModal] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     fetch("api/blacklist")
@@ -62,38 +63,46 @@ const BlacklistTable = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {blacklist
-            .filter(
-              (item) =>
-                item.ip.toLowerCase().includes(search.toLowerCase()) ||
-                item.reason.toLowerCase().includes(search.toLowerCase()),
-            )
-            .map((item, index) => (
-              <TableRow key={item._id}>
-                <TableCell>{index + 1}</TableCell>
-                <TableCell>{item.ip}</TableCell>
-                <TableCell>{item.reason}</TableCell>
-                <TableCell>{moment(item.timestamp).fromNow()}</TableCell>
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <span className="sr-only">Open menu</span>
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem
-                        onClick={() => handleDelete(item._id)}
-                        className="text-red-500"
-                      >
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
+          {blacklist.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={8} className="text-center font-bold">
+                Nothing found
+              </TableCell>
+            </TableRow>
+          ) : (
+            blacklist
+              .filter(
+                (item) =>
+                  item.ip.toLowerCase().includes(search.toLowerCase()) ||
+                  item.reason.toLowerCase().includes(search.toLowerCase()),
+              )
+              .map((item, index) => (
+                <TableRow key={item._id}>
+                  <TableCell>{index + 1}</TableCell>
+                  <TableCell>{item.ip}</TableCell>
+                  <TableCell>{item.reason}</TableCell>
+                  <TableCell>{moment(item.timestamp).fromNow()}</TableCell>
+                  <TableCell>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <span className="sr-only">Open menu</span>
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          onClick={() => handleDelete(item._id)}
+                          className="text-red-500"
+                        >
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))
+          )}
         </TableBody>
         <TableFooter>
           <TableRow>

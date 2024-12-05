@@ -109,7 +109,7 @@ async function hasXSS(input: string, c: Context) {
       }
       await database.collection("blacklist").insertOne({
         ip,
-        type: "XSS attack detected",
+        reason: "XSS attack detected",
         timestamp: new Date(),
       });
 
